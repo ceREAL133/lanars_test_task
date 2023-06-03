@@ -1,12 +1,12 @@
-import { Express, Request, Response } from 'express';
+import { Express } from 'express';
 import {
 	getUsers,
 	addUser,
 	getUserById,
 	updateUser,
 	deleteUser,
-} from './controller';
-import { healthcheck } from '../helpers/healthcheck';
+} from './src/user/controller';
+import { healthcheck } from './src/helpers/healthcheck';
 
 const { isUserByIdExist } = require('../middlewares/isUserByIdExist');
 const { isUserByEmailExist } = require('../middlewares/isUserByEmailExist');

@@ -1,15 +1,12 @@
-// import { Pool } from 'pg';
 import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
-// export const pool = new Pool({
-// 	user: 'postgres',
-// 	host: 'localhost',
-// 	database: 'lanars',
-// 	password: 'root',
-// 	port: 5432,
-// });
+dotenv.config();
 
-export const sequelize = new Sequelize('lanars', 'postgres', 'root', {
+const db = process.env.DATABASE as string;
+const password = process.env.PASSWORD as string;
+
+export const sequelize = new Sequelize(db, 'postgres', password, {
 	host: 'localhost',
 	dialect: 'postgres',
 });
