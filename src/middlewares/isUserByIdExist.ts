@@ -1,24 +1,18 @@
-import { PoolClient, QueryResult } from 'pg';
-import { getUserByIdQuery } from '../user/queries';
 import { NextFunction, Request, Response } from 'express';
-import { pool } from '../../db';
+import { User } from '../user/model';
 
-export const isUserByIdExist = (
+export const isUserByIdExist = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
 	const { id } = req.params;
 
-	pool.query(
-		getUserByIdQuery,
-		[id],
-		(err: Error, data: QueryResult<PoolClient>) => {
-			const noUserFound = !data.rows.length;
+	const user = await User.findOne({ where: { id } });
 
-			if (noUserFound) {
-				return res.send('User does not exists in db');
-			} else next();
-		}
-	);
+	if (!user) {
+		return res.status(404).send('User with this id not found');
+	}
+
+	next();
 };

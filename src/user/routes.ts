@@ -6,14 +6,13 @@ import {
 	updateUser,
 	deleteUser,
 } from './controller';
+import { healthcheck } from '../helpers/healthcheck';
 
 const { isUserByIdExist } = require('../middlewares/isUserByIdExist');
 const { isUserByEmailExist } = require('../middlewares/isUserByEmailExist');
 
 export default function routes(app: Express) {
-	app.get('/healthcheck', (req: Request, res: Response) => {
-		res.sendStatus(200);
-	});
+	app.get('/healthcheck', healthcheck);
 	app.get('/api/users', getUsers);
 	app.post('/api/users', isUserByEmailExist, addUser);
 	app.get('/api/users/:id', isUserByIdExist, getUserById);

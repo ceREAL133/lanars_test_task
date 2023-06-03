@@ -1,59 +1,63 @@
 import { Request, Response } from 'express';
-import { pool } from '../../db';
-import {
-	addUserQuery,
-	deleteUserQuery,
-	getUserByIdQuery,
-	getUsersQuery,
-	updateUserQuery,
-} from './queries';
+import { sequelize } from '../../db';
+import { User } from './model';
 
-export const getUsers = (req: Request, res: Response) => {
-	pool.query(getUsersQuery, (err, data) => {
-		if (err) throw err;
+export const getUsers = async (req: Request, res: Response) => {
+	try {
+		const users = await User.findAll();
 
-		res.status(200).json(data.rows);
-	});
+		return res.status(200).send(users);
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };
 
-export const getUserById = (req: Request, res: Response) => {
+export const getUserById = async (req: Request, res: Response) => {
 	const { id } = req.params;
 
-	pool.query(getUserByIdQuery, [id], (err, data) => {
-		if (err) throw err;
+	try {
+		const user = await User.findOne({ where: { id } });
 
-		res.status(200).json(data.rows);
-	});
+		return res.status(200).send(user);
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };
 
-export const addUser = (req: Request, res: Response) => {
+export const addUser = async (req: Request, res: Response) => {
+	try {
+		const user = await User.create(req.body);
+
+		return res.status(200).send(user);
+	} catch (error: any) {
+		throw new Error(error);
+	}
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+	const { id } = req.params;
+	try {
+		await User.destroy({ where: { id } });
+
+		return res.status(200).send(`user with id ${id} was deleted`);
+	} catch (error: any) {
+		throw new Error(error);
+	}
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+	const { id } = req.params;
+
 	const { name, email, password } = req.body;
 
-	pool.query(addUserQuery, [name, email, password], (err, data) => {
-		if (err) throw err;
-
-		res.status(201).send(
-			`User with name ${name}, email ${email}, password ${password} has been created`
+	try {
+		const user = await User.update(
+			{ name, email, password },
+			{ where: { id }, returning: true }
 		);
-	});
-};
 
-export const deleteUser = (req: Request, res: Response) => {
-	const { id } = req.params;
-
-	pool.query(deleteUserQuery, [id], (err, data) => {
-		if (err) throw err;
-
-		return res.status(200).send(`User with id ${id} was deleted`);
-	});
-};
-
-export const updateUser = (req: Request, res: Response) => {
-	const { id } = req.params;
-	const { name, email } = req.body;
-
-	pool.query(updateUserQuery, [id, name, email], (err, data) => {
-		if (err) throw err;
-		res.status(200).send('User updated successfully');
-	});
+		return res.status(200).send(user);
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };

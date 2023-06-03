@@ -1,24 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
-import { pool } from '../../db';
-import { checkEmailExistsQuery } from '../user/queries';
-import { PoolClient, QueryResult } from 'pg';
+import { User } from '../user/model';
 
-export const isUserByEmailExist = (
+export const isUserByEmailExist = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
 	const { email } = req.body;
+	const user = await User.findOne({ where: { email } });
 
-	pool.query(
-		checkEmailExistsQuery,
-		[email],
-		(err, data: QueryResult<PoolClient>) => {
-			const noUserFound = !data.rows.length;
+	if (user) {
+		return res.status(409).send('User with this email already exist');
+	}
 
-			if (noUserFound) {
-				next();
-			} else return res.send('User already exists in db');
-		}
-	);
+	next();
 };
