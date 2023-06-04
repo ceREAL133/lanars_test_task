@@ -3,7 +3,6 @@ import routes from './routes';
 import deserializeUser from './src/middlewares/deserializeUser';
 
 const app = express();
-const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -13,8 +12,8 @@ app.get('/', (req, res) => {
 	res.send('Hello, programm is working');
 });
 
-app.listen(port, () => {
-	console.log(`app listening on port ${port}`);
+app.listen(process.env.PORT, () => {
+	console.log(`app listening on port ${process.env.PORT}`);
 
 	routes(app);
 });

@@ -8,6 +8,7 @@ export const requiresUser = async (
 	next: NextFunction
 ) => {
 	const user = get(req, 'user');
+
 	// @ts-ignore
 	const sessionId = get(req, 'user.session');
 

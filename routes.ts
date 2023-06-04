@@ -15,6 +15,13 @@ import {
 } from './src/session/session.controller';
 import requiresUser from './src/middlewares/requiresUser';
 import { isUserUpdatingHimself } from './src/middlewares/isUserUpdatingHimself';
+import {
+	addPortfolio,
+	getUserPortfolios,
+	removePortfolio,
+	updatePortfolio,
+} from './src/portfolio/portfolio.controller';
+import { isPortfolioBelongsToUser } from './src/middlewares/isPortfolioBelonsToUser';
 
 export default function routes(app: Express) {
 	app.get('/healthcheck', healthcheck);
@@ -39,4 +46,19 @@ export default function routes(app: Express) {
 
 	app.post('/api/sessions', createUserSession);
 	app.delete('/api/sessions', requiresUser, invalidateUserSession);
+
+	app.get('/api/portfolios', getUserPortfolios);
+	app.post('/api/portfolios', requiresUser, addPortfolio);
+	app.put(
+		'/api/portfolios/:id',
+		requiresUser,
+		isPortfolioBelongsToUser,
+		updatePortfolio
+	);
+	app.delete(
+		'/api/portfolios/:id',
+		requiresUser,
+		isPortfolioBelongsToUser,
+		removePortfolio
+	);
 }

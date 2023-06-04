@@ -1,4 +1,4 @@
-import { Model, DataTypes, Optional } from 'sequelize';
+import { Model, Optional, INTEGER, BOOLEAN, STRING, DATE } from 'sequelize';
 import { sequelize } from '../../db';
 import { User } from '../user/user.model';
 
@@ -19,12 +19,12 @@ export const Session = sequelize.define<
 	'Session',
 	{
 		id: {
-			type: DataTypes.INTEGER,
+			type: INTEGER,
 			primaryKey: true,
 			autoIncrement: true,
 		},
 		userId: {
-			type: DataTypes.INTEGER,
+			type: INTEGER,
 			allowNull: false,
 			references: {
 				model: User,
@@ -32,19 +32,19 @@ export const Session = sequelize.define<
 			},
 		},
 		valid: {
-			type: DataTypes.BOOLEAN,
+			type: BOOLEAN,
 			allowNull: false,
 			defaultValue: true,
 		},
 		useragent: {
-			type: DataTypes.STRING,
+			type: STRING,
 		},
 		createdat: {
-			type: DataTypes.DATE,
+			type: DATE,
 			allowNull: false,
 		},
 		updatedat: {
-			type: DataTypes.DATE,
+			type: DATE,
 			allowNull: false,
 		},
 	},
