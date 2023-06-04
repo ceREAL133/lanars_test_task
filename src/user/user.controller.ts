@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { sequelize } from '../../db';
-import { User } from './model';
+import { User } from './user.model';
+import { Session } from '../session/session.model';
 
 export const getUsers = async (req: Request, res: Response) => {
 	try {
@@ -37,6 +37,20 @@ export const addUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	try {
+		const sessions = await Session.findAll({
+			where: { userId: id },
+		});
+
+		for (const session of sessions) {
+			await session.update({ valid: false });
+		}
+		await Session.update(
+			{ userId: null },
+			{
+				where: { userId: id },
+			}
+		);
+
 		await User.destroy({ where: { id } });
 
 		return res.status(200).send(`user with id ${id} was deleted`);
@@ -48,11 +62,11 @@ export const deleteUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
 	const { id } = req.params;
 
-	const { name, email, password } = req.body;
+	const { name, email } = req.body;
 
 	try {
 		const user = await User.update(
-			{ name, email, password },
+			{ name, email },
 			{ where: { id }, returning: true }
 		);
 

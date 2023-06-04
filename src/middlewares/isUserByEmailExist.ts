@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { User } from '../user/model';
+import { User } from '../user/user.model';
 
 export const isUserByEmailExist = async (
 	req: Request,

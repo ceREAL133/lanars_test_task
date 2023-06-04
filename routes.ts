@@ -5,17 +5,38 @@ import {
 	getUserById,
 	updateUser,
 	deleteUser,
-} from './src/user/controller';
+} from './src/user/user.controller';
 import { healthcheck } from './src/helpers/healthcheck';
-
-const { isUserByIdExist } = require('../middlewares/isUserByIdExist');
-const { isUserByEmailExist } = require('../middlewares/isUserByEmailExist');
+import { isUserByIdExist } from './src/middlewares/isUserByIdExist';
+import { isUserByEmailExist } from './src/middlewares/isUserByEmailExist';
+import {
+	createUserSession,
+	invalidateUserSession,
+} from './src/session/session.controller';
+import requiresUser from './src/middlewares/requiresUser';
+import { isUserUpdatingHimself } from './src/middlewares/isUserUpdatingHimself';
 
 export default function routes(app: Express) {
 	app.get('/healthcheck', healthcheck);
-	app.get('/api/users', getUsers);
+
 	app.post('/api/users', isUserByEmailExist, addUser);
-	app.get('/api/users/:id', isUserByIdExist, getUserById);
-	app.put('/api/users/:id', isUserByIdExist, updateUser);
-	app.delete('/api/users/:id', isUserByIdExist, deleteUser);
+	app.get('/api/users', requiresUser, getUsers);
+	app.get('/api/users/:id', isUserByIdExist, requiresUser, getUserById);
+	app.put(
+		'/api/users/:id',
+		isUserByIdExist,
+		requiresUser,
+		isUserUpdatingHimself,
+		updateUser
+	);
+	app.delete(
+		'/api/users/:id',
+		isUserByIdExist,
+		requiresUser,
+		isUserUpdatingHimself,
+		deleteUser
+	);
+
+	app.post('/api/sessions', createUserSession);
+	app.delete('/api/sessions', requiresUser, invalidateUserSession);
 }
