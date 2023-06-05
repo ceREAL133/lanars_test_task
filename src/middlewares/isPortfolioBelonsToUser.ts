@@ -9,11 +9,11 @@ export const isPortfolioBelongsToUser = async (
 ) => {
 	const userId = getUser(req);
 
-	const { id: portfolioId } = req.params;
+	const { portfolioid } = req.params;
 
 	if (userId) {
 		const foundPortfolio = await Portfolio.findOne({
-			where: { id: portfolioId },
+			where: { id: portfolioid },
 		});
 		const portfolioToBeUpdated = foundPortfolio?.toJSON();
 

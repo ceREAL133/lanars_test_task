@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { Portfolio } from './portfolio.model';
-import { get } from 'lodash';
 import { getUser } from '../helpers/getUser';
 
 export const getUserPortfolios = async (req: Request, res: Response) => {
@@ -35,7 +34,7 @@ export const addPortfolio = async (req: Request, res: Response) => {
 };
 
 export const updatePortfolio = async (req: Request, res: Response) => {
-	const { id: portfolioId } = req.params;
+	const { portfolioid } = req.params;
 	const { name, description } = req.body;
 
 	try {
@@ -45,7 +44,7 @@ export const updatePortfolio = async (req: Request, res: Response) => {
 				description,
 				updatedat: new Date(),
 			},
-			{ where: { id: portfolioId }, returning: true }
+			{ where: { id: portfolioid }, returning: true }
 		);
 
 		return res.status(200).send(updatedPortfolio);
@@ -55,16 +54,14 @@ export const updatePortfolio = async (req: Request, res: Response) => {
 };
 
 export const removePortfolio = async (req: Request, res: Response) => {
-	const { id: portfolioId } = req.params;
-
-	console.log(portfolioId);
+	const { portfolioid } = req.params;
 
 	try {
-		await Portfolio.destroy({ where: { id: portfolioId } });
+		await Portfolio.destroy({ where: { id: portfolioid } });
 
 		return res
 			.status(200)
-			.send(`Portfolio with id ${portfolioId} was deleted`);
+			.send(`Portfolio with id ${portfolioid} was deleted`);
 	} catch (error: any) {
 		throw new Error(error);
 	}

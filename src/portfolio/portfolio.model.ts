@@ -1,7 +1,6 @@
 import { Model, Optional, STRING, INTEGER, DATE } from 'sequelize';
 import { sequelize } from '../../db';
 import { User } from '../user/user.model';
-import { Image } from '../image/image.model';
 
 export interface PortfolioAttributes {
 	id: number;
@@ -52,5 +51,7 @@ export const Portfolio = sequelize.define<
 	}
 );
 
+export const Image = require('../image/image.model').Image; // Import Image model after it's defined
+
 Portfolio.belongsTo(User, { foreignKey: 'userid', as: 'portfolioUser' });
-Portfolio.hasMany(Image, { foreignKey: 'portfolioId', as: 'imagesUser' });
+Portfolio.hasMany(Image, { foreignKey: 'portfolioid', as: 'images' });

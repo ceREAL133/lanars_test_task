@@ -22,6 +22,12 @@ import {
 	updatePortfolio,
 } from './src/portfolio/portfolio.controller';
 import { isPortfolioBelongsToUser } from './src/middlewares/isPortfolioBelonsToUser';
+import {
+	getAllImages,
+	getImageInformationWithPortfolio,
+	uploadImageToPortfolio,
+} from './src/image/image.controller';
+import { upload } from './src/middlewares/uploadFile';
 
 export default function routes(app: Express) {
 	app.get('/healthcheck', healthcheck);
@@ -47,18 +53,28 @@ export default function routes(app: Express) {
 	app.post('/api/sessions', createUserSession);
 	app.delete('/api/sessions', requiresUser, invalidateUserSession);
 
-	app.get('/api/portfolios', getUserPortfolios);
+	app.get('/api/portfolios', getUserPortfolios); //add isPortfolioBelonstoUser
 	app.post('/api/portfolios', requiresUser, addPortfolio);
 	app.put(
-		'/api/portfolios/:id',
+		'/api/portfolios/:portfolioid',
 		requiresUser,
 		isPortfolioBelongsToUser,
 		updatePortfolio
 	);
 	app.delete(
-		'/api/portfolios/:id',
+		'/api/portfolios/:portfolioid',
 		requiresUser,
 		isPortfolioBelongsToUser,
 		removePortfolio
+	);
+
+	// app.get('/api/images', getAllImages);
+	app.get('/api/images', getImageInformationWithPortfolio);
+	app.post(
+		'/api/images/:portfolioid',
+		requiresUser,
+		isPortfolioBelongsToUser,
+		upload.single('image'),
+		uploadImageToPortfolio
 	);
 }

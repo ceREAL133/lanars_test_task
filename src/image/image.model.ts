@@ -1,54 +1,64 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, STRING, INTEGER, DATE, ARRAY, Optional } from 'sequelize';
 import { sequelize } from '../../db';
+import { Portfolio } from '../portfolio/portfolio.model';
 
 export interface ImageAttributes {
 	id: number;
 	name: string;
 	description: string;
 	comments: string[];
-	imageUrl: string;
-	createdAt: Date;
-	updatedAt: Date;
+	portfolioid: number;
+	imageurl: string;
+	createdat: Date;
+	updatedat: Date;
 }
 
 export interface ImageInstance
-	extends Model<ImageAttributes>,
+	extends Model<Optional<ImageAttributes, 'id'>>,
 		ImageAttributes {}
 
-export const Image = sequelize.define<ImageInstance>(
+export const Image = sequelize.define<ImageInstance, ImageAttributes>(
 	'Image',
 	{
 		id: {
-			type: DataTypes.INTEGER,
+			type: INTEGER,
 			autoIncrement: true,
 			primaryKey: true,
 		},
 		name: {
-			type: DataTypes.STRING,
+			type: STRING,
 			allowNull: false,
 		},
 		description: {
-			type: DataTypes.STRING,
+			type: STRING,
 			allowNull: false,
 		},
 		comments: {
-			type: DataTypes.ARRAY(DataTypes.STRING),
+			type: ARRAY(STRING),
 			defaultValue: [],
 		},
-		imageUrl: {
-			type: DataTypes.STRING,
+		portfolioid: {
+			type: INTEGER,
 			allowNull: false,
 		},
-		createdAt: {
-			type: DataTypes.DATE,
+		imageurl: {
+			type: STRING,
 			allowNull: false,
 		},
-		updatedAt: {
-			type: DataTypes.DATE,
+		createdat: {
+			type: DATE,
+			allowNull: false,
+		},
+		updatedat: {
+			type: DATE,
 			allowNull: false,
 		},
 	},
 	{
 		tableName: 'images',
+		timestamps: false,
 	}
 );
+
+Image.belongsTo(Portfolio, { foreignKey: 'portfolioid', as: 'portfolio' });
+export { Portfolio };
