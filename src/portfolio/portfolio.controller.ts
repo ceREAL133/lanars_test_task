@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { Portfolio } from './portfolio.model';
-import { getUser } from '../helpers/getUser';
+import { getUserId } from '../helpers/getUserId';
 
 export const getUserPortfolios = async (req: Request, res: Response) => {
 	try {
-		const portfolios = await Portfolio.findAll();
+		const userid = getUserId(req);
+		const portfolios = await Portfolio.findAll({ where: { userid } });
 
 		res.status(200).send(portfolios);
 	} catch (error: any) {
@@ -13,7 +14,7 @@ export const getUserPortfolios = async (req: Request, res: Response) => {
 };
 
 export const addPortfolio = async (req: Request, res: Response) => {
-	const userId = getUser(req);
+	const userId = getUserId(req);
 
 	if (userId) {
 		try {

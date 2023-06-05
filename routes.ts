@@ -23,11 +23,14 @@ import {
 } from './src/portfolio/portfolio.controller';
 import { isPortfolioBelongsToUser } from './src/middlewares/isPortfolioBelonsToUser';
 import {
-	getAllImages,
+	getImagesByUser,
 	getImageInformationWithPortfolio,
 	uploadImageToPortfolio,
+	deleteUserImage,
 } from './src/image/image.controller';
 import { upload } from './src/middlewares/uploadFile';
+import { isImageBelongsToUser } from './src/middlewares/isImageBelongsToUser';
+import { isPortfolioHaveImages } from './src/middlewares/isPortfolioHaveImages';
 
 export default function routes(app: Express) {
 	app.get('/healthcheck', healthcheck);
@@ -53,7 +56,7 @@ export default function routes(app: Express) {
 	app.post('/api/sessions', createUserSession);
 	app.delete('/api/sessions', requiresUser, invalidateUserSession);
 
-	app.get('/api/portfolios', getUserPortfolios); //add isPortfolioBelonstoUser
+	app.get('/api/portfolios', requiresUser, getUserPortfolios); //add isPortfolioBelonstoUser
 	app.post('/api/portfolios', requiresUser, addPortfolio);
 	app.put(
 		'/api/portfolios/:portfolioid',
@@ -65,11 +68,12 @@ export default function routes(app: Express) {
 		'/api/portfolios/:portfolioid',
 		requiresUser,
 		isPortfolioBelongsToUser,
+		isPortfolioHaveImages,
 		removePortfolio
 	);
 
-	// app.get('/api/images', getAllImages);
 	app.get('/api/images', getImageInformationWithPortfolio);
+	app.get('/api/images/userImages', requiresUser, getImagesByUser);
 	app.post(
 		'/api/images/:portfolioid',
 		requiresUser,
@@ -77,4 +81,16 @@ export default function routes(app: Express) {
 		upload.single('image'),
 		uploadImageToPortfolio
 	);
+	app.delete(
+		'/api/images/:imageid',
+		requiresUser,
+		isImageBelongsToUser,
+		deleteUserImage
+	);
+
+	app.get('/example', (req, res, next) => {
+		const error = new Error('Bad Request') as any;
+		error.statusCode = 400;
+		next(error);
+	});
 }

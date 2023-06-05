@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { Portfolio } from '../portfolio/portfolio.model';
-import { getUser } from '../helpers/getUser';
+import { getUserId } from '../helpers/getUserId';
 
 export const isPortfolioBelongsToUser = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
-	const userId = getUser(req);
+	const userId = getUserId(req);
 
 	const { portfolioid } = req.params;
 

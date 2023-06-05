@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
-import { Image, ImageAttributes } from './image.model';
+import { Image } from './image.model';
 import { Portfolio } from '../portfolio/portfolio.model';
+import { getUserId } from '../helpers/getUserId';
+import { User } from '../user/user.model';
+import { deleteFile } from '../helpers/deleteFIle';
 
 export const uploadImageToPortfolio = async (req: Request, res: Response) => {
 	try {
@@ -30,13 +33,42 @@ export const uploadImageToPortfolio = async (req: Request, res: Response) => {
 	}
 };
 
-export const getAllImages = async (req: Request, res: Response) => {
+export const getImagesByUser = async (req: Request, res: Response) => {
 	try {
-		const images = await Image.findAll();
+		const userId = getUserId(req);
 
-		res.status(200).send(images);
-	} catch (error: any) {
-		throw new Error(error);
+		console.log(userId);
+
+		const portfolios = await Portfolio.findAll({
+			where: { userid: userId },
+			attributes: ['id'],
+		});
+
+		const portfolioIds = portfolios.map((portfolio: any) => portfolio.id);
+
+		const images = await Image.findAll({
+			where: { portfolioid: portfolioIds },
+			include: [
+				{
+					model: Portfolio,
+					as: 'portfolio',
+					attributes: ['name'],
+					include: [
+						{
+							model: User,
+							as: 'portfolioUser',
+							attributes: [],
+							where: { id: userId },
+						},
+					],
+				},
+			],
+		});
+
+		return res.json(images);
+	} catch (error) {
+		console.error('Error fetching images by user:', error);
+		throw error;
 	}
 };
 
@@ -56,5 +88,25 @@ export const getImageInformationWithPortfolio = async (
 	} catch (error) {
 		console.error('Error fetching image information:', error);
 		throw error;
+	}
+};
+
+export const deleteUserImage = async (req: Request, res: Response) => {
+	const { imageid } = req.params;
+
+	const imageToBeDeleted = await Image.findOne({ where: { id: imageid } });
+	if (imageToBeDeleted) {
+		try {
+			const filePath = imageToBeDeleted.imageurl;
+
+			await Image.destroy({ where: { id: imageid } });
+			deleteFile(filePath);
+
+			return res.status(200).send(`Image with id ${imageid} was deleted`);
+		} catch (error: any) {
+			throw new Error(error);
+		}
+	} else {
+		res.status(404).send('No such image');
 	}
 };
