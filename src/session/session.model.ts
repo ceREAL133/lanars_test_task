@@ -25,7 +25,7 @@ export const Session = sequelize.define<
 		},
 		userId: {
 			type: INTEGER,
-			allowNull: false,
+			allowNull: true,
 			references: {
 				model: User,
 				key: 'id',

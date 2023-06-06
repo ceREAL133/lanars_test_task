@@ -56,7 +56,7 @@ export default function routes(app: Express) {
 	app.post('/api/sessions', createUserSession);
 	app.delete('/api/sessions', requiresUser, invalidateUserSession);
 
-	app.get('/api/portfolios', requiresUser, getUserPortfolios); //add isPortfolioBelonstoUser
+	app.get('/api/portfolios', requiresUser, getUserPortfolios);
 	app.post('/api/portfolios', requiresUser, addPortfolio);
 	app.put(
 		'/api/portfolios/:portfolioid',

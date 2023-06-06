@@ -37,23 +37,10 @@ export const addUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	try {
-		const sessions = await Session.findAll({
-			where: { userId: id },
-		});
-
-		for (const session of sessions) {
-			await session.update({ valid: false });
-		}
-		await Session.update(
-			{ userId: null },
-			{
-				where: { userId: id },
-			}
-		);
-
+		await Session.destroy({ where: { userId: id } });
 		await User.destroy({ where: { id } });
 
-		return res.status(200).send(`user with id ${id} was deleted`);
+		return res.status(200).send(`User with id ${id} was deleted`);
 	} catch (error: any) {
 		throw new Error(error);
 	}

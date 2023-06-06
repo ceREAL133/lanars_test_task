@@ -26,6 +26,14 @@ export const createUserSession = async (req: Request, res: Response) => {
 	return res.send({ accessToken, refreshToken });
 };
 
+export const invalidateUserSession = async (req: Request, res: Response) => {
+	const sessionId = get(req, 'user.session');
+
+	await Session.update({ valid: false }, { where: { id: sessionId } });
+
+	return res.status(200).json('Logout successful');
+};
+
 export async function createSession(userId: number, userAgent: string) {
 	const session = await Session.create({
 		userId,
@@ -37,14 +45,6 @@ export async function createSession(userId: number, userAgent: string) {
 
 	return session.toJSON();
 }
-
-export const invalidateUserSession = async (req: Request, res: Response) => {
-	const sessionId = get(req, 'user.session');
-
-	await Session.update({ valid: false }, { where: { id: sessionId } });
-
-	return res.status(200).json('Logout successful');
-};
 
 export function createAccessToken({
 	user,
